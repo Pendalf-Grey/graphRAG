@@ -7,12 +7,9 @@ def reload_config():
     """
     load_dotenv(override=True)
     
-    model_provider = os.getenv("DEFAULT_MODEL_PROVIDER", "openai").strip("'").lower()
-    
-    if model_provider == "openai":
-        vector_dimension = int(os.getenv("OPENAI_VECTOR_DIMENSION", "1536"))
-    else:
-        vector_dimension = int(os.getenv("OLLAMA_VECTOR_DIMENSION", "768"))
+    model_provider = os.getenv("DEFAULT_MODEL_PROVIDER", "ollama").strip("'").lower()
+
+    vector_dimension = int(os.getenv("OLLAMA_VECTOR_DIMENSION", "768"))
         
     return model_provider, vector_dimension
 
