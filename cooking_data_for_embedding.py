@@ -1,5 +1,5 @@
 # Чтение из raw_data.txt, приведение к нижнему регистру, запись в output1.txt
-with open('raw_data.txt', 'r', encoding='utf-8') as infile, \
+with open('data.txt', 'r', encoding='utf-8') as infile, \
      open('output1.txt', 'w', encoding='utf-8') as outfile:
     for line in infile:
         outfile.write(line.lower())
