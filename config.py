@@ -27,10 +27,3 @@ OLLAMA_INFERENCE_MODEL = os.getenv("OLLAMA_INFERENCE_MODEL", "qwen2.5:14b")
 OLLAMA_VECTOR_DIMENSION = int(os.getenv("OLLAMA_VECTOR_DIMENSION", "768"))
 
 
-if __name__ == "__main__":
-    print("Конфигурация загружена")
-    print(f"MODEL_PROVIDER = {MODEL_PROVIDER}")
-    print(f"VECTOR_DIMENSION = {VECTOR_DIMENSION}")
-    print(f"LLM_MODEL = {LLM_MODEL}")
-    print(f"EMBEDDING_MODEL = {EMBEDDING_MODEL}")
-    print(f"OLLAMA_BASE_URL = {OLLAMA_BASE_URL}")

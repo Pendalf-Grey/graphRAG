@@ -33,31 +33,41 @@ class GraphComponents(BaseModel):
     graph: list[Single]
 
 @lru_cache(maxsize=128)
-def cached_ollama_call(prompt: str, model: Optional[str] = None) -> str:
+def cached_ollama_call(prompt: str,
+                       model: Optional[str] = None,
+                       system: Optional[str] = None,
+                       temperature: float = 0.0,
+                       max_tokens: int = 4000) -> str:
     """
-    Cached version of Ollama API call to avoid redundant calls.
+    Cached version of Ollama API call with optional system prompt and generation parameters.
     """
     if model is None:
         model = OLLAMA_INFERENCE_MODEL
 
+    messages = []
+    if system:
+        messages.append({"role": "system", "content": system})
+    else:
+        # Default system prompt if none provided
+        messages.append({
+            "role": "system",
+            "content": (
+                "You are a precise graph relationship extractor. Extract all relationships from the text "
+                "and format them as a JSON object with this exact structure:\n"
+                '{ "graph": [ {"node": "Person/Entity", "target_node": "Related Entity", "relationship": "Type of Relationship"}, ... ] }\n'
+                "Include ALL relationships mentioned in the text, including implicit ones. Be thorough and precise."
+            )
+        })
+    messages.append({"role": "user", "content": prompt})
+
     payload = {
         "model": model,
         "stream": False,
-        "messages": [
-            {
-                "role": "system",
-                "content": (
-                    "You are a precise graph relationship extractor. Extract all relationships from the text "
-                    "and format them as a JSON object with this exact structure:\n"
-                    '{ "graph": [ {"node": "Person/Entity", "target_node": "Related Entity", "relationship": "Type of Relationship"}, ... ] }\n'
-                    "Include ALL relationships mentioned in the text, including implicit ones. Be thorough and precise."
-                )
-            },
-            {
-                "role": "user",
-                "content": prompt
-            }
-        ]
+        "messages": messages,
+        "options": {
+            "temperature": temperature,
+            "num_predict": max_tokens
+        }
     }
 
     try:
@@ -68,13 +78,13 @@ def cached_ollama_call(prompt: str, model: Optional[str] = None) -> str:
             return result['message']['content']
         else:
             print(f"Warning: Unexpected API response format: {result}")
-            return """{"graph": []}"""
+            return '{"graph": []}'
     except requests.exceptions.ConnectionError:
         print(f"Error: Could not connect to Ollama API at {OLLAMA_BASE_URL}")
-        return """{"graph": []}"""
+        return '{"graph": []}'
     except Exception as e:
         print(f"Error in Ollama API call: {str(e)}")
-        return """{"graph": []}"""
+        return '{"graph": []}'
 
 def ollama_llm_parser(prompt: str) -> GraphComponents:
     """

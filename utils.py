@@ -28,15 +28,3 @@ def check_data_exists(neo4j_driver, qdrant_client, collection_name):
         qdrant_count = 0
     return neo4j_count > 0 and qdrant_count > 0
 
-
-if __name__ == "__main__":
-    from clients import initialize_clients
-
-    driver, client, coll = initialize_clients()
-
-    exists = check_data_exists(driver, client, coll)
-    print(f"Данные существуют? {exists}")
-
-    # Внимание: раскомментируйте следующую строку только если хотите очистить базы!
-    # clear_data(driver, client, coll)
-    driver.close()

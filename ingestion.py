@@ -7,17 +7,17 @@ def create_collection(client, collection_name, vector_dimension=VECTOR_DIMENSION
     """Create a Qdrant collection if it doesn't exist."""
     try:
         client.get_collection(collection_name)
-        print(f"Skipping creating collection; '{collection_name}' already exists.")
+        print(f"Пропускаем создание коллекции; '{collection_name}' уже существует.")
     except Exception as e:
         if 'Not found: Collection' in str(e):
-            print(f"Collection '{collection_name}' not found. Creating it now...")
+            print(f"Коллекция '{collection_name}' не существует. Создаем...")
             client.create_collection(
                 collection_name=collection_name,
                 vectors_config=models.VectorParams(size=vector_dimension, distance=models.Distance.COSINE)
             )
-            print(f"Collection '{collection_name}' created successfully.")
+            print(f"Коллекция '{collection_name}' создана успешно.")
         else:
-            print(f"Error while checking collection: {e}")
+            print(f"Ошибка при проерке коллекции: {e}")
 
 
 # Загрузка в Neo4j
@@ -71,23 +71,3 @@ def ingest_to_qdrant(qdrant_client, collection_name, raw_data, node_id_mapping):
         batch = points[i:i + batch_size]
         qdrant_client.upsert(collection_name=collection_name, points=batch)
         print(f"Uploaded batch {i // batch_size + 1}/{(len(points) + batch_size - 1) // batch_size} to Qdrant")
-
-
-if __name__ == "__main__":
-    from clients import initialize_clients
-    from config import VECTOR_DIMENSION
-
-    driver, client, coll = initialize_clients()
-    print("Проверка создания коллекции...")
-    create_collection(client, coll, VECTOR_DIMENSION)
-
-    # тестовые данные
-    nodes = {"ТестУзел": "123"}
-    rels = [{"source": "123", "target": "123", "type": "ТЕСТ"}]
-    print("Загрузка в Neo4j (мини тест)...")
-    ingest_to_neo4j(driver, nodes, rels)
-
-    print("Загрузка в Qdrant (мини тест)...")
-    ingest_to_qdrant(client, coll, "тестовый параграф", nodes)
-
-    driver.close()

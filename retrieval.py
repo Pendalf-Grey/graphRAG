@@ -61,13 +61,3 @@ def format_graph_context(subgraph):
     return {"nodes": list(nodes), "edges": edges}
 
 
-if __name__ == "__main__":
-    from clients import initialize_clients
-    from config import embeddings
-
-    driver, client, coll = initialize_clients()
-    # Просто проверяем, что функции определены и импортируются
-    print("Функции поиска импортированы")
-    # пример вызова (требует данных, поэтому просто тест импорта)
-    print("retriever_search, fetch_related_graph, format_graph_context доступны")
-    driver.close()

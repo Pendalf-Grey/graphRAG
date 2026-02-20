@@ -16,10 +16,20 @@ if __name__ == "__main__":
     print("Загрузка переменных окружения и инициализация клиентов...")
     load_dotenv('.env.example')
     neo4j_driver, qdrant_client, collection_name = initialize_clients()
+
+    # Проверка на говно
+    print(f"neo4j_driver - {neo4j_driver}")
+    print(f"neo4j_driver - {qdrant_client}")
+    print(f"neo4j_driver - {collection_name}")
+
     print("Клиент и драйвер инициализированы")
 
     print("Создание коллекции...")
     create_collection(qdrant_client, collection_name, VECTOR_DIMENSION)
+
+    # Проверка на говно
+    print(f'create_collection - {create_collection}')
+
     print("Коллекция создана/проверена")
 
     # Проверка наличия данных
@@ -35,8 +45,17 @@ if __name__ == "__main__":
             print(f"Error: Data file '{data_file}' not found.")
             exit(1)
 
+        # Проверка на говно
+        print(f'check_data_exists - {check_data_exists}')
+
+
         print("Извлечение компонентов графа...")
         nodes, relationships = extract_graph_components(raw_data)
+
+        # Проверка на говно
+        print(f'ноды -{nodes}')
+        print(f'связи- {relationships}')
+
         print(f"Узлов: {len(nodes)}, отношений: {len(relationships)}")
 
         print("Загрузка в Neo4j...")
@@ -47,8 +66,12 @@ if __name__ == "__main__":
         ingest_to_qdrant(qdrant_client, collection_name, raw_data, node_id_mapping)
         print("Загрузка в Qdrant успешна")
 
+
+
     # Поиск и ответ
-    query = "Сколько всего ангелов ты знаешь? Перечисли их поименно"
+    query = "Какие даты привязаны к каким ангелам и за что эти ангелы отвечают. Также подробно расскажи обо всем, что связано с ангелами. Кто такой розовый бегемот?"
+
+
     print("Начало поиска с помощью Ретривера...")
     retriever_result = retriever_search(neo4j_driver, qdrant_client, collection_name, query)
     print("Результаты поиска с помощью Ретривера:", retriever_result)

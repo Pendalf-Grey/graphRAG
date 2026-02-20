@@ -23,8 +23,3 @@ def initialize_clients():
 
     return neo4j_driver, qdrant_client, collection_name
 
-if __name__ == "__main__":
-    driver, client, coll = initialize_clients()
-    print("Neo4j driver и Qdrant client инициализированы")
-    print(f"Коллекция по умолчанию: {coll}")
-    driver.close()  # закрываем драйвер после проверки
