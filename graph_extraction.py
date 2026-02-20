@@ -1,11 +1,10 @@
 import json
 import re
 import uuid
-from config import processor  # для получения Single
-from processors.ollama_processor import cached_ollama_call  # путь может отличаться
+from config import processor
+from processors.ollama_processor import cached_ollama_call
 
-
-def split_text_into_chunks(text, max_tokens=3000, overlap=200):
+def split_text_into_chunks(text, max_tokens=2000, overlap=200):
     """
     Разбивает большой текст на чанки примерно по max_tokens токенов с перекрытием.
     Используется простая эвристика: 1 токен ≈ 1.3 слова (для русского текста).
@@ -45,7 +44,8 @@ def extract_graph_components(raw_data: str):
     Формат: {"graph": [{"node": "...", "target_node": "...", "relationship": "..."}]}
     Если ничего не найдено, верни {"graph": []}."""
 
-    chunks = split_text_into_chunks(raw_data, max_tokens=3000, overlap=200)
+    # Уменьшаем размер чанка до 2000 токенов, чтобы модель выдавала меньше фактов за раз
+    chunks = split_text_into_chunks(raw_data, max_tokens=2000, overlap=200)
     print(f"Текст разбит на {len(chunks)} чанков")
     all_graph_items = []
 
@@ -59,7 +59,7 @@ def extract_graph_components(raw_data: str):
             prompt=user_prompt,
             system=system_prompt,
             temperature=0.0,
-            max_tokens=8000
+            max_tokens=48000   # Увеличиваем лимит ответа, чтобы модель точно дописала JSON
         )
 
         # ОТЛАДКА: выводим первые 1000 символов ответа модели
@@ -92,7 +92,6 @@ def extract_graph_components(raw_data: str):
 
         all_graph_items.extend(data["graph"])
 
-    # ... остальная часть функции (объединение, создание nodes/relationships) без изменений
     if not all_graph_items:
         print("Не найдено ни одного элемента графа во всех чанках.")
         return {}, []
